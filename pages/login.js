@@ -30,8 +30,11 @@ export default function Login() {
       });
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token);
-        router.push('/');
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('token', data.token);
+          // Use window.location.href to ensure complete page reload
+          window.location.href = '/';
+        }
       } else {
         setError(data.error);
       }

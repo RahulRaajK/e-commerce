@@ -1,10 +1,9 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import dbConnect from '../../lib/dbConnect';
-import User from '../../models/User';
+import dbConnect from '@/lib/dbConnect.js';
+import User from '@/models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req, res) {
   await dbConnect();
   if (req.method === 'POST') {
     const { username, password } = req.body;

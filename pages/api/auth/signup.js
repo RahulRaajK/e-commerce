@@ -1,10 +1,9 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import dbConnect from '../../lib/dbConnect';
-import User from '../../models/User';
+import dbConnect from '@/lib/dbConnect.js';
+import User from '@/models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req, res) {
   await dbConnect();
   if (req.method === 'POST') {
     const { username, email, password } = req.body;
@@ -17,11 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'User already exists' });
       }
       const hashedPassword = await bcrypt.hash(password, 12);
-      const user = new User({
-        username,
-        email,
-        password: hashedPassword
-      });
+      const user = new User({ username, email, password: hashedPassword });
       await user.save();
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res.status(201).json({ token, user: { id: user._id, username: user.username, email: user.email } });

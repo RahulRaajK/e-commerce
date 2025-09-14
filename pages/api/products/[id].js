@@ -1,7 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import dbConnect from '../../lib/dbConnect';
-import Product from '../../models/Product';
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+import dbConnect from '@/lib/dbConnect.js';
+import Product from '@/models/Product.js';
+export default async function handler(req, res) {
   await dbConnect();
   const { id } = req.query;
   if (req.method === 'GET') {

@@ -9,16 +9,20 @@ export default function Cart() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    if (typeof window === 'undefined') return;
+    const token = sessionStorage.getItem('token');
     if (!token) {
       router.push('/login');
       return;
     }
     fetchUser();
     fetchCart();
+    fetchProfileData();
   }, []);
   const fetchUser = async () => {
-    const token = localStorage.getItem('token');
+    if (typeof window === 'undefined') return;
+    
+    const token = sessionStorage.getItem('token');
     try {
       const response = await fetch('/api/auth/me', {
         headers: {
@@ -32,8 +36,40 @@ export default function Cart() {
       router.push('/login');
     }
   };
+
+  const fetchProfileData = async () => {
+    if (typeof window === 'undefined') return; // Skip on server side
+    
+    const token = sessionStorage.getItem('token');
+    try {
+      const response = await fetch('/api/user/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProfileData(data.user);
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+  };
+
+  const autoFillShippingInfo = () => {
+    if (profileData) {
+      setShippingInfo({
+        firstName: profileData.firstName || '',
+        lastName: profileData.lastName || '',
+        phone: profileData.phone || '',
+        plusCode: profileData.plusCode || ''
+      });
+    }
+  };
   const fetchCart = async () => {
-    const token = localStorage.getItem('token');
+    if (typeof window === 'undefined') return; // Skip on server side
+    
+    const token = sessionStorage.getItem('token');
     try {
       const response = await fetch('/api/cart', {
         headers: {
@@ -55,7 +91,9 @@ export default function Cart() {
     }
   };
   const updateQuantity = async (productId, newQuantity) => {
-    const token = localStorage.getItem('token');
+    if (typeof window === 'undefined') return; // Skip on server side
+    
+    const token = sessionStorage.getItem('token');
     try {
       await fetch('/api/cart', {
         method: 'PUT',
@@ -71,7 +109,9 @@ export default function Cart() {
     }
   };
   const removeItem = async (productId) => {
-    const token = localStorage.getItem('token');
+    if (typeof window === 'undefined') return; // Skip on server side
+    
+    const token = sessionStorage.getItem('token');
     try {
       await fetch('/api/cart', {
         method: 'DELETE',
@@ -86,19 +126,92 @@ export default function Cart() {
       console.error('Error removing item:', error);
     }
   };
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [shippingInfo, setShippingInfo] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    plusCode: ''
+  });
+  const [profileData, setProfileData] = useState(null);
+
+  const handleShippingChange = (e) => {
+    const { name, value } = e.target;
+    setShippingInfo(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const checkout = async () => {
-    const token = localStorage.getItem('token');
+    if (cart.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+    setShowCheckoutForm(true);
+  };
+
+  const processCheckout = async () => {
+    if (typeof window === 'undefined') return; // Skip on server side
+    
+    const token = sessionStorage.getItem('token');
+    
+    // Validate shipping information
+    const requiredFields = ['firstName', 'lastName', 'phone', 'plusCode'];
+    for (const field of requiredFields) {
+      if (!shippingInfo[field].trim()) {
+        alert(`Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+        return;
+      }
+    }
+
+    // Validate Plus Code format
+    const plusCodeRegex = /^[23456789CFGHJMPQRVWX]{4,8}\+[23456789CFGHJMPQRVWX]{2,4}$/i;
+    const cleanedPlusCode = shippingInfo.plusCode.replace(/\s/g, '');
+    if (!plusCodeRegex.test(cleanedPlusCode)) {
+      alert('Please enter a valid Google Plus Code (e.g., 57FC+4XH, 8F6C+2XH)');
+      return;
+    }
+
     try {
-      await fetch('/api/checkout', {
+      // Create order
+      const orderResponse = await fetch('/api/orders', {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify({
+          items: cart.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity
+          })),
+          shippingInfo: shippingInfo
+        })
       });
-      alert('Checkout successful!');
-      fetchCart();
+
+      if (orderResponse.ok) {
+        // Clear cart
+        await fetch('/api/checkout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        alert('Order placed successfully!');
+        setShowCheckoutForm(false);
+        fetchCart();
+        
+        // Redirect to orders page after successful order
+        router.push('/orders');
+      } else {
+        const errorData = await orderResponse.json();
+        alert(`Error: ${errorData.error}`);
+      }
     } catch (error) {
       console.error('Error during checkout:', error);
+      alert('An error occurred during checkout. Please try again.');
     }
   };
   const getTotalPrice = () => {
@@ -136,7 +249,9 @@ export default function Cart() {
                 </Link>
                 <button
                   onClick={() => {
-                    localStorage.removeItem('token');
+                    if (typeof window !== 'undefined') {
+                      sessionStorage.removeItem('token');
+                    }
                     router.push('/');
                   }}
                   className="text-gray-700 hover:text-gray-900"
@@ -176,7 +291,7 @@ export default function Cart() {
                           />
                           <div className="ml-4">
                             <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
-                            <p className="text-gray-600">${product.price}</p>
+                            <p className="text-gray-600">₹{product.price}</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-4">
@@ -196,7 +311,7 @@ export default function Cart() {
                             </button>
                           </div>
                           <span className="text-lg font-medium text-gray-900">
-                            ${(product.price * item.quantity).toFixed(2)}
+                            ₹{(product.price * item.quantity).toFixed(2)}
                           </span>
                           <button
                             onClick={() => removeItem(item.productId)}
@@ -212,7 +327,7 @@ export default function Cart() {
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                   <div className="flex justify-between items-center">
                     <span className="text-xl font-bold text-gray-900">
-                      Total: ${getTotalPrice().toFixed(2)}
+                      Total: ₹{getTotalPrice().toFixed(2)}
                     </span>
                     <button
                       onClick={checkout}
@@ -226,6 +341,121 @@ export default function Cart() {
             )}
           </div>
         </main>
+
+        {/* Checkout Form Modal */}
+        {showCheckoutForm && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">Shipping Information</h3>
+                  {profileData && (
+                    <button
+                      type="button"
+                      onClick={autoFillShippingInfo}
+                      className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm"
+                    >
+                      Auto-fill from Profile
+                    </button>
+                  )}
+                </div>
+                
+                <form className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">First Name</label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={shippingInfo.firstName}
+                        onChange={handleShippingChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={shippingInfo.lastName}
+                        onChange={handleShippingChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={shippingInfo.phone}
+                      onChange={handleShippingChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Google Plus Code</label>
+                    <input
+                      type="text"
+                      name="plusCode"
+                      value={shippingInfo.plusCode}
+                      onChange={handleShippingChange}
+                      placeholder="e.g., 57FC+4XH"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Enter your Google Plus Code for precise delivery location. You can find it in Google Maps by dropping a pin.
+                    </p>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <h4 className="font-medium text-gray-900 mb-2">Order Summary</h4>
+                    <div className="space-y-1 text-sm text-gray-600">
+                      {cart.map((item) => {
+                        const product = products[item.productId];
+                        return (
+                          <div key={item.productId} className="flex justify-between">
+                            <span>{product?.name} x {item.quantity}</span>
+                            <span>₹{(product?.price * item.quantity).toFixed(2)}</span>
+                          </div>
+                        );
+                      })}
+                      <div className="border-t pt-1 mt-2 font-medium text-gray-900">
+                        <div className="flex justify-between">
+                          <span>Total:</span>
+                          <span>₹{getTotalPrice().toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowCheckoutForm(false)}
+                      className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={processCheckout}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Place Order
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

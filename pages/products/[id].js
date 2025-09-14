@@ -25,7 +25,9 @@ export default function ProductDetails() {
     }
   };
   const addToCart = async () => {
-    const token = localStorage.getItem('token');
+    if (typeof window === 'undefined') return; // Skip on server side
+    
+    const token = sessionStorage.getItem('token');
     if (!token) {
       router.push('/login');
       return;
@@ -40,6 +42,9 @@ export default function ProductDetails() {
         body: JSON.stringify({ productId: id, quantity })
       });
       alert('Product added to cart!');
+      
+      // Redirect to cart page after adding to cart
+      router.push('/cart');
     } catch (error) {
       console.error('Error adding to cart:', error);
     }
@@ -110,7 +115,7 @@ export default function ProductDetails() {
                   <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
                   <p className="text-gray-600 mb-6">{product.description}</p>
                   <div className="mb-6">
-                    <span className="text-3xl font-bold text-gray-900">${product.price}</span>
+                    <span className="text-3xl font-bold text-gray-900">₹{product.price}</span>
                     <span className="ml-4 text-sm text-gray-500">Stock: {product.stock}</span>
                   </div>
                   <div className="mb-6">
