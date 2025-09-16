@@ -257,7 +257,7 @@ export default function Profile() {
                     </p>
                   )}
                   <p className="mt-1 text-sm text-gray-500">
-                    Enter your Google Plus Code for precise location. Format: 4-8 characters + "+" + 2-4 characters. 
+                    Enter your Google Plus Code for precise location. Format: 4-8 characters + &quot;+&quot; + 2-4 characters. 
                     You can find it in Google Maps by dropping a pin.
                   </p>
                 </div>

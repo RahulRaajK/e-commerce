@@ -319,7 +319,7 @@ export default function Orders() {
                           Cancel Order
                         </button>
                         <p className="text-xs text-red-600 mt-2 text-center">
-                          You can only cancel orders that haven't been shipped yet
+                          You can only cancel orders that haven&apos;t been shipped yet
                         </p>
                       </div>
                     )}
