@@ -41,7 +41,7 @@ export default async function handler(req, res) {
             category: 'Fashion'
           },
           {
-            name: 'boAt Airdopes',
+            name: 'Boat Airdopes',
             description: 'Truly wireless earbuds with immersive sound and long battery.',
             price: 1999,
             image: 'https://images.unsplash.com/photo-1606229364791-5e8e79fba399?q=80&w=1200&auto=format&fit=crop',
