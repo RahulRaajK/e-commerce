@@ -109,6 +109,9 @@ export default function ProductDetails() {
                     className="h-96 w-full object-cover"
                     src={product.image}
                     alt={product.name}
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&h=800&fit=crop&crop=center&auto=format&q=60';
+                    }}
                   />
                 </div>
                 <div className="md:w-1/2 p-8">

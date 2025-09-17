@@ -847,6 +847,9 @@ export default function Home() {
                           className="h-48 w-full object-cover"
                           src={product.image}
                           alt={product.name}
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop&crop=center&auto=format&q=60';
+                          }}
                         />
                         <div className="p-6">
                           <h3 className="text-lg font-medium text-gray-900 mb-2">{product.name}</h3>

@@ -273,8 +273,11 @@ export default function Orders() {
                           <div key={index} className="flex items-center space-x-4">
                             <img
                               className="h-16 w-16 object-cover rounded-md"
-                              src={item.product?.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop&crop=center'}
+                              src={item.product?.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop&crop=center&auto=format&q=60'}
                               alt={item.product?.name || 'Product'}
+                              onError={(e) => {
+                                e.currentTarget.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop&crop=center&auto=format&q=60';
+                              }}
                             />
                             <div className="flex-1">
                               <h5 className="text-sm font-medium text-gray-900">
