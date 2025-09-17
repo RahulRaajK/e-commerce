@@ -5,13 +5,22 @@ async function cleanupProducts() {
   try {
     await dbConnect();
     
+    // Normalize Boat Airdopes naming/image
+    await Product.updateMany(
+      { name: { $regex: /(boAt Airdopes|boat airdopes|Boat Airdopes)/i } },
+      { $set: {
+        name: 'Boat Airdopes',
+        image: 'https://images.unsplash.com/photo-1606229364791-5e8e79fba399?q=80&w=1200&auto=format&fit=crop'
+      } }
+    );
+    
     // Define the 8 products we want to keep
     const keepProducts = [
       'ROG Phone',
       'ROG Laptops', 
       'Skybags Backpacks',
       'Fastrack Sunglasses',
-      'boAt Airdopes',
+      'Boat Airdopes',
       'Smart Watch',
       'Bluetooth Speakers',
       'Joystick'
