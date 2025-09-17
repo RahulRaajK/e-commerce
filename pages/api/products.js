@@ -39,6 +39,38 @@ export default async function handler(req, res) {
             image: 'https://images.unsplash.com/photo-1493666438817-866a91353ca9?q=80&w=1200&auto=format&fit=crop',
             stock: 60,
             category: 'Home & Garden'
+          },
+          {
+            name: 'Lightweight Running Shoes',
+            description: 'Breathable mesh upper with cushioned sole for daily runs',
+            price: 2799,
+            image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop',
+            stock: 80,
+            category: 'Sports'
+          },
+          {
+            name: 'Bluetooth Speaker',
+            description: 'Portable speaker with deep bass and 12h battery life',
+            price: 1499,
+            image: 'https://images.unsplash.com/photo-1518443899511-8453e07b6b97?q=80&w=1200&auto=format&fit=crop',
+            stock: 70,
+            category: 'Electronics'
+          },
+          {
+            name: 'Stainless Water Bottle',
+            description: 'Insulated, keeps drinks cold for 24h and hot for 12h',
+            price: 699,
+            image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop',
+            stock: 150,
+            category: 'Sports'
+          },
+          {
+            name: 'Minimalist Backpack',
+            description: 'Water-resistant everyday backpack with laptop sleeve',
+            price: 1899,
+            image: 'https://images.unsplash.com/photo-1518544801976-3e159e50e5bb?q=80&w=1200&auto=format&fit=crop',
+            stock: 90,
+            category: 'Accessories'
           }
         ];
         await Product.insertMany(mockProducts);
