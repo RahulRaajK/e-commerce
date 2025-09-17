@@ -12,7 +12,7 @@ export default async function handler(req, res) {
             name: 'ROG Phone',
             description: 'Gaming smartphone with high-refresh display and performance cooling.',
             price: 59999,
-            image: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=1200&auto=format&fit=crop',
+            image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?q=80&w=1200&auto=format&fit=crop',
             stock: 30,
             category: 'Electronics'
           },
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
             name: 'ROG Laptops',
             description: 'High-performance gaming laptop with RGB and dedicated GPU.',
             price: 119999,
-            image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop',
+            image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=1200&auto=format&fit=crop',
             stock: 20,
             category: 'Electronics'
           },
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
             name: 'Skybags Backpacks',
             description: 'Durable and stylish backpack for travel and daily commute.',
             price: 2499,
-            image: 'https://images.unsplash.com/photo-1518544801976-3e159e50e5bb?q=80&w=1200&auto=format&fit=crop',
+            image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1200&auto=format&fit=crop',
             stock: 100,
             category: 'Accessories'
           },
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
             name: 'Fastrack Sunglasses',
             description: 'Trendy UV-protection sunglasses for everyday style.',
             price: 1499,
-            image: 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=1200&auto=format&fit=crop',
+            image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=1200&auto=format&fit=crop',
             stock: 120,
             category: 'Fashion'
           },
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
             name: 'Smart Watch',
             description: 'Track fitness, heart rate, and notifications on the go.',
             price: 3499,
-            image: 'https://images.unsplash.com/photo-1517433670267-08bbd4be890f?q=80&w=1200&auto=format&fit=crop',
+            image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop',
             stock: 80,
             category: 'Electronics'
           },
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
             name: 'Bluetooth Speakers',
             description: 'Portable speakers with deep bass and 12h battery life.',
             price: 2499,
-            image: 'https://images.unsplash.com/photo-1518443899511-8453e07b6b97?q=80&w=1200&auto=format&fit=crop',
+            image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?q=80&w=1200&auto=format&fit=crop',
             stock: 60,
             category: 'Electronics'
           },
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
             name: 'Joystick',
             description: 'Ergonomic game controller for console and PC.',
             price: 2999,
-            image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop',
+            image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=1200&auto=format&fit=crop',
             stock: 50,
             category: 'Gaming'
           }
