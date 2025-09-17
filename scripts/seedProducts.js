@@ -4,12 +4,6 @@ import Product from '../models/Product.js';
 async function seedProducts() {
   try {
     await dbConnect();
-    const count = await Product.countDocuments();
-    if (count > 0) {
-      console.log(`Products already exist: ${count}`);
-      process.exit(0);
-    }
-
     const mockProducts = [
       {
         name: 'Wireless Headphones',
@@ -77,8 +71,16 @@ async function seedProducts() {
       }
     ];
 
-    const result = await Product.insertMany(mockProducts);
-    console.log(`Inserted ${result.length} products.`);
+    // Insert only missing products by name
+    const existing = await Product.find({ name: { $in: mockProducts.map(p => p.name) } }).select('name');
+    const existingNames = new Set(existing.map(p => p.name));
+    const toInsert = mockProducts.filter(p => !existingNames.has(p.name));
+    if (toInsert.length > 0) {
+      const result = await Product.insertMany(toInsert);
+      console.log(`Inserted ${result.length} missing products.`);
+    } else {
+      console.log('All mock products already present, nothing to insert.');
+    }
     const newCount = await Product.countDocuments();
     console.log(`Total products now: ${newCount}`);
     process.exit(0);
