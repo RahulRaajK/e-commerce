@@ -237,13 +237,26 @@ export default function Admin() {
   const fetchProducts = async () => {
     if (typeof window === 'undefined') return; // Skip on server side
     
+    const token = sessionStorage.getItem('adminToken');
     try {
-      const response = await fetch('/api/admin/products');
+      const response = await fetch('/api/admin/products', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (response.ok) {
         const data = await response.json();
+        console.log('Products fetched:', data.products);
         setProducts(data.products);
       } else {
-        console.error('Error fetching products');
+        console.error('Error fetching products:', response.status);
+        // Try fetching from public API as fallback
+        const publicResponse = await fetch('/api/products');
+        if (publicResponse.ok) {
+          const publicData = await publicResponse.json();
+          console.log('Products fetched from public API:', publicData);
+          setProducts(publicData);
+        }
       }
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -831,6 +844,7 @@ export default function Admin() {
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
                     <p className="text-sm text-gray-600 mt-1">Manage your product catalog and inventory</p>
+                    <p className="text-xs text-gray-500 mt-1">Products loaded: {products.length}</p>
                   </div>
                   <div className="flex space-x-3">
                     <Link 
@@ -1039,7 +1053,18 @@ export default function Admin() {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {products.map((product) => (
+                        {products.length === 0 ? (
+                          <tr>
+                            <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                              <div className="flex flex-col items-center">
+                                <div className="text-4xl mb-4">📦</div>
+                                <div className="text-lg font-medium mb-2">No products found</div>
+                                <div className="text-sm">Click "Add New Product" to get started</div>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : (
+                          products.map((product) => (
                           <tr key={product._id}>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
@@ -1080,7 +1105,8 @@ export default function Admin() {
                               </div>
                             </td>
                           </tr>
-                        ))}
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
