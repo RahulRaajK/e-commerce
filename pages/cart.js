@@ -2,16 +2,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
-import { useCart } from '../contexts/CartContext';
-
 export default function Cart() {
   const router = useRouter();
-  const { cart, updateCartItem, removeFromCart } = useCart();
+  const [cart, setCart] = useState([]);
   const [products, setProducts] = useState({});
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [profileData, setProfileData] = useState(null);
-
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const token = sessionStorage.getItem('token');
@@ -20,9 +16,9 @@ export default function Cart() {
       return;
     }
     fetchUser();
-    fetchProducts();
+    fetchCart();
     fetchProfileData();
-  }, [cart, router]);
+  }, []);
   const fetchUser = async () => {
     if (typeof window === 'undefined') return;
     
@@ -70,41 +66,65 @@ export default function Cart() {
       });
     }
   };
-  const fetchProducts = async () => {
-    if (typeof window === 'undefined') return;
+  const fetchCart = async () => {
+    if (typeof window === 'undefined') return; // Skip on server side
     
+    const token = sessionStorage.getItem('token');
     try {
-      const productIds = cart.map(item => item.productId);
-      for (const productId of productIds) {
-        if (!products[productId]) {
-          const productResponse = await fetch(`/api/products/${productId}`);
-          const productData = await productResponse.json();
-          setProducts(prev => ({ ...prev, [productId]: productData }));
+      const response = await fetch('/api/cart', {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
+      });
+      const cartData = await response.json();
+      setCart(cartData);
+      const productIds = cartData.map(item => item.productId);
+      for (const productId of productIds) {
+        const productResponse = await fetch(`/api/products/${productId}`);
+        const productData = await productResponse.json();
+        setProducts(prev => ({ ...prev, [productId]: productData }));
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching cart:', error);
     } finally {
       setLoading(false);
     }
   };
-  const handleUpdateQuantity = async (productId, newQuantity) => {
-    await updateCartItem(productId, newQuantity);
-    if (newQuantity <= 0) {
-      setProducts(prev => {
-        const newProducts = { ...prev };
-        delete newProducts[productId];
-        return newProducts;
+  const updateQuantity = async (productId, newQuantity) => {
+    if (typeof window === 'undefined') return; // Skip on server side
+    
+    const token = sessionStorage.getItem('token');
+    try {
+      await fetch('/api/cart', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId, quantity: newQuantity })
       });
+      fetchCart();
+    } catch (error) {
+      console.error('Error updating cart:', error);
     }
   };
-  const handleRemoveItem = async (productId) => {
-    await removeFromCart(productId);
-    setProducts(prev => {
-      const newProducts = { ...prev };
-      delete newProducts[productId];
-      return newProducts;
-    });
+  const removeItem = async (productId) => {
+    if (typeof window === 'undefined') return; // Skip on server side
+    
+    const token = sessionStorage.getItem('token');
+    try {
+      await fetch('/api/cart', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId })
+      });
+      fetchCart();
+    } catch (error) {
+      console.error('Error removing item:', error);
+    }
   };
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [shippingInfo, setShippingInfo] = useState({
@@ -113,6 +133,7 @@ export default function Cart() {
     phone: '',
     plusCode: ''
   });
+  const [profileData, setProfileData] = useState(null);
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
@@ -276,14 +297,14 @@ export default function Cart() {
                         <div className="flex items-center space-x-4">
                           <div className="flex items-center">
                             <button
-                              onClick={() => handleUpdateQuantity(item.productId, item.quantity - 1)}
+                              onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                               className="bg-gray-200 text-gray-600 px-2 py-1 rounded-md hover:bg-gray-300"
                             >
                               -
                             </button>
                             <span className="mx-3 text-lg font-medium">{item.quantity}</span>
                             <button
-                              onClick={() => handleUpdateQuantity(item.productId, item.quantity + 1)}
+                              onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                               className="bg-gray-200 text-gray-600 px-2 py-1 rounded-md hover:bg-gray-300"
                             >
                               +
@@ -293,7 +314,7 @@ export default function Cart() {
                             ₹{(product.price * item.quantity).toFixed(2)}
                           </span>
                           <button
-                            onClick={() => handleRemoveItem(item.productId)}
+                            onClick={() => removeItem(item.productId)}
                             className="text-red-600 hover:text-red-800"
                           >
                             Remove
@@ -389,7 +410,7 @@ export default function Cart() {
                       required
                     />
                     <p className="mt-1 text-sm text-gray-500">
-                      Enter your Google Plus Code for precise delivery location.
+                      Enter your Google Plus Code for precise delivery location. You can find it in Google Maps by dropping a pin.
                     </p>
                   </div>
 

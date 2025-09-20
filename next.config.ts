@@ -16,8 +16,9 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  compress: true,
-  poweredByHeader: false,
-  reactStrictMode: true,
+  // Force rebuild to ensure local images are served
+  generateBuildId: async () => {
+    return 'rog-images-update-' + Date.now();
+  },
 };
 export default nextConfig;

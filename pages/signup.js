@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 export default function Signup() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -9,6 +11,7 @@ export default function Signup() {
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const handleChange = (e) => {
     setFormData({
       ...formData,

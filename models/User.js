@@ -48,20 +48,7 @@ const UserSchema = new mongoose.Schema({
       },
       message: 'Please enter a valid Google Plus Code (e.g., 57FC+4XH, 8F6C+2XH, etc.)'
     }
-  },
-  cart: [{
-    productId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      required: true
-    },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1,
-      default: 1
-    }
-  }]
+  }
 }, {
   timestamps: true
 });
