@@ -9,7 +9,7 @@ async function seedProducts() {
         name: 'ROG Phone',
         description: 'Gaming smartphone with high-refresh display and performance cooling.',
         price: 59999,
-        image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1000&h=1000&fit=crop&crop=center&auto=format',
+        image: '/rog-phone.png',
         stock: 30,
         category: 'Electronics'
       },
