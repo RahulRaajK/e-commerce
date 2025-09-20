@@ -18,7 +18,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-gray-50 flex justify-center items-center">
       <Head>
-        <title>ROG Store - Loading...</title>
+        <title>e-commerce Store - Loading...</title>
       </Head>
       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
     </div>

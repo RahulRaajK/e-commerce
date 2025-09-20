@@ -156,7 +156,7 @@ export default function Orders() {
   return (
     <>
       <Head>
-        <title>Order History - ROG Store</title>
+        <title>Order History - e-commerce Store</title>
         <meta name="description" content="View your order history" />
       </Head>
       <div className="min-h-screen bg-gray-50">
@@ -165,7 +165,7 @@ export default function Orders() {
             <div className="flex justify-between h-16">
               <div className="flex items-center">
                 <Link href="/" className="text-xl font-bold text-gray-900">
-                  ROG Store
+                  e-commerce Store
                 </Link>
               </div>
               <div className="flex items-center space-x-4">
