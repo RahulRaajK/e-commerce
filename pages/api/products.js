@@ -25,7 +25,7 @@ export default async function handler(req, res) {
             category: 'Electronics'
           },
           {
-            name: 'Skybags Backpacks',
+            name: 'ROG Backpacks',
             description: 'Durable and stylish backpack for travel and daily commute.',
             price: 2499,
             image: '/rog-backpack.png',
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
             category: 'Accessories'
           },
           {
-            name: 'Fastrack Sunglasses',
+            name: 'ROG Sunglasses',
             description: 'Trendy UV-protection sunglasses for everyday style.',
             price: 1499,
             image: '/rog-sunglasses.png',
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
             category: 'Fashion'
           },
           {
-            name: 'Boat Airdopes',
+            name: 'ROG Airdopes',
             description: 'Truly wireless earbuds with immersive sound and long battery.',
             price: 1999,
             image: '/rog-airdopes.png',
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
             category: 'Electronics'
           },
           {
-            name: 'Smart Watch',
+            name: 'ROG Smart Watch',
             description: 'Track fitness, heart rate, and notifications on the go.',
             price: 3499,
             image: '/rog-smartwatches.png',
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
             category: 'Electronics'
           },
           {
-            name: 'Bluetooth Speakers',
+            name: 'ROG Speakers',
             description: 'Portable speakers with deep bass and 12h battery life.',
             price: 2499,
             image: '/rog-speaker.png',
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
             category: 'Electronics'
           },
           {
-            name: 'Joystick',
+            name: 'ROG Joystick',
             description: 'Ergonomic game controller for console and PC.',
             price: 2999,
             image: '/rog- joysruck.png',
