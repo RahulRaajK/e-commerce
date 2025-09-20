@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
+import { useCart } from '../../contexts/CartContext';
+
 export default function ProductDetails() {
   const router = useRouter();
   const { id } = router.query;
+  const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -24,29 +27,11 @@ export default function ProductDetails() {
       setLoading(false);
     }
   };
-  const addToCart = async () => {
-    if (typeof window === 'undefined') return; // Skip on server side
-    
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-    try {
-      await fetch('/api/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ productId: id, quantity })
-      });
+  const handleAddToCart = async () => {
+    const success = await addToCart(id, quantity);
+    if (success) {
       alert('Product added to cart!');
-      
-      // Redirect to cart page after adding to cart
       router.push('/cart');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
     }
   };
   if (loading) {
@@ -135,7 +120,7 @@ export default function ProductDetails() {
                     />
                   </div>
                   <button
-                    onClick={addToCart}
+                    onClick={handleAddToCart}
                     disabled={product.stock === 0}
                     className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >

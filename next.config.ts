@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -22,5 +21,4 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 };
-
 export default nextConfig;

@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { useCart } from '../contexts/CartContext';
 
 export default function Home() {
   const router = useRouter();
+  const { addToCart, cartCount } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -52,30 +54,10 @@ export default function Home() {
     }
   };
 
-  const addToCart = async (productId) => {
-    if (typeof window === 'undefined') return;
-    
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-    
-    try {
-      const response = await fetch('/api/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ productId, quantity: 1 })
-      });
-      
-      if (response.ok) {
-        alert('Product added to cart!');
-      }
-    } catch (error) {
-      console.error('Error adding to cart:', error);
+  const handleAddToCart = async (productId) => {
+    const success = await addToCart(productId, 1);
+    if (success) {
+      alert('Product added to cart!');
     }
   };
 
@@ -105,7 +87,7 @@ export default function Home() {
                 <>
                   <span className="text-gray-700">Welcome, {user.username}</span>
                   <Link href="/cart" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                    Cart
+                    Cart ({cartCount})
                   </Link>
                   <Link href="/orders" className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
                     Orders
@@ -168,7 +150,7 @@ export default function Home() {
                       View
                     </Link>
                     <button
-                      onClick={() => addToCart(product._id)}
+                      onClick={() => handleAddToCart(product._id)}
                       className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 text-sm"
                     >
                       Add to Cart
