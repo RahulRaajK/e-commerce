@@ -104,9 +104,9 @@ export default function ProductDetails() {
             </Link>
             <div className="bg-white shadow rounded-lg overflow-hidden">
               <div className="md:flex">
-                <div className="md:w-1/2 bg-gray-100 flex items-center justify-center">
+                <div className="md:w-1/2">
                   <img
-                    className="max-h-96 max-w-full object-contain"
+                    className="h-96 w-full object-cover"
                     src={product.image}
                     alt={product.name}
                     onError={(e) => {
