@@ -156,7 +156,7 @@ export default function Orders() {
   return (
     <>
       <Head>
-        <title>Order History - E-Commerce Store</title>
+        <title>Order History - ROG Store</title>
         <meta name="description" content="View your order history" />
       </Head>
       <div className="min-h-screen bg-gray-50">
@@ -165,7 +165,7 @@ export default function Orders() {
             <div className="flex justify-between h-16">
               <div className="flex items-center">
                 <Link href="/" className="text-xl font-bold text-gray-900">
-                  E-Commerce
+                  ROG Store
                 </Link>
               </div>
               <div className="flex items-center space-x-4">
@@ -298,18 +298,8 @@ export default function Orders() {
                       <p className="text-sm text-gray-600">
                         {order.shippingInfo.firstName} {order.shippingInfo.lastName}<br />
                         Phone: {order.shippingInfo.phone}<br />
-                        <span className="font-medium">Google Plus Code:</span> {order.shippingInfo.plusCode}
+                        <span className="font-medium">Location Code:</span> {order.shippingInfo.plusCode}
                       </p>
-                      <div className="mt-2">
-                        <a 
-                          href={`https://maps.google.com/?q=${order.shippingInfo.plusCode}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          📍 View location on Google Maps
-                        </a>
-                      </div>
                     </div>
 
                     {/* Cancel Order Button - Only show for orders that can be cancelled */}
