@@ -21,6 +21,9 @@ export default function AdminDashboard() {
     stock: ''
   });
   const [productLoading, setProductLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -131,6 +134,46 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!selectedFile) return null;
+    
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', selectedFile);
+      
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.imageUrl;
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Image upload failed');
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const addProduct = async (e) => {
     e.preventDefault();
     if (typeof window === 'undefined') return;
@@ -139,13 +182,29 @@ export default function AdminDashboard() {
     setProductLoading(true);
     
     try {
+      let imageUrl = productForm.image;
+      
+      // If a file is selected, upload it first
+      if (selectedFile) {
+        imageUrl = await uploadImage();
+        if (!imageUrl) {
+          setProductLoading(false);
+          return;
+        }
+      }
+      
+      const productData = {
+        ...productForm,
+        image: imageUrl
+      };
+      
       const response = await fetch('/api/admin/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(productForm)
+        body: JSON.stringify(productData)
       });
 
       if (response.ok) {
@@ -159,6 +218,8 @@ export default function AdminDashboard() {
           category: '',
           stock: ''
         });
+        setSelectedFile(null);
+        setImagePreview(null);
         setShowProductForm(false);
         alert('Product added successfully!');
       } else {
@@ -361,37 +422,64 @@ export default function AdminDashboard() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                    <input
-                      type="url"
-                      placeholder="https://example.com/product-image.jpg"
-                      value={productForm.image}
-                      onChange={(e) => setProductForm(prev => ({ ...prev, image: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                    {productForm.image && (
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
-                        <img
-                          src={productForm.image}
-                          alt="Product preview"
-                          className="h-32 w-32 object-cover rounded-md border border-gray-300"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                    <div className="space-y-3">
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileSelect}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
+                        <p className="text-xs text-gray-500 mt-1">Upload an image file (JPG, PNG, GIF - Max 5MB)</p>
                       </div>
-                    )}
+                      
+                      {imagePreview && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
+                          <img
+                            src={imagePreview}
+                            alt="Product preview"
+                            className="h-32 w-32 object-cover rounded-md border border-gray-300"
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="text-center text-gray-500">OR</div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Image URL (Alternative)</label>
+                        <input
+                          type="url"
+                          placeholder="https://example.com/product-image.jpg"
+                          value={productForm.image}
+                          onChange={(e) => setProductForm(prev => ({ ...prev, image: e.target.value }))}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        {productForm.image && !imagePreview && (
+                          <div className="mt-2">
+                            <p className="text-sm text-gray-600 mb-2">URL Preview:</p>
+                            <img
+                              src={productForm.image}
+                              alt="Product preview"
+                              className="h-32 w-32 object-cover rounded-md border border-gray-300"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="flex space-x-3">
                     <button
                       type="submit"
-                      disabled={productLoading}
+                      disabled={productLoading || uploading}
                       className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
-                      {productLoading ? 'Adding Product...' : 'Add Product'}
+                      {uploading ? 'Uploading Image...' : productLoading ? 'Adding Product...' : 'Add Product'}
                     </button>
                     <button
                       type="button"

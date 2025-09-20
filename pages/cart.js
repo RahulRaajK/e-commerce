@@ -113,7 +113,6 @@ export default function Cart() {
     phone: '',
     plusCode: ''
   });
-  const [profileData, setProfileData] = useState(null);
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
