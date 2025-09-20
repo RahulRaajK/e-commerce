@@ -268,54 +268,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <nav className="bg-gray-800 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center space-x-8 py-4">
-            <button
-              onClick={() => router.push('/')}
-              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              🏠 Home
-            </button>
-            <button
-              onClick={() => router.push('/products')}
-              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              🛍️ Products
-            </button>
-            <button
-              onClick={() => router.push('/cart')}
-              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              🛒 Cart
-            </button>
-            <button
-              onClick={() => router.push('/orders')}
-              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              📦 Orders
-            </button>
-            <button
-              onClick={() => router.push('/profile')}
-              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              👤 Profile
-            </button>
-            <button
-              onClick={() => router.push('/login')}
-              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              🔐 Login
-            </button>
-            <button
-              onClick={() => router.push('/signup')}
-              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              ✨ Sign Up
-            </button>
-          </div>
-        </div>
-      </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 gap-8">
