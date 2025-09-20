@@ -172,6 +172,7 @@ export default function Admin() {
     stock: ''
   });
   const [productLoading, setProductLoading] = useState(false);
+  const [productsLoading, setProductsLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return; // Skip on server side
@@ -237,29 +238,23 @@ export default function Admin() {
   const fetchProducts = async () => {
     if (typeof window === 'undefined') return; // Skip on server side
     
-    const token = sessionStorage.getItem('adminToken');
+    setProductsLoading(true);
     try {
-      const response = await fetch('/api/admin/products', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // Use public API to fetch products (no auth required)
+      const response = await fetch('/api/products');
       if (response.ok) {
         const data = await response.json();
-        console.log('Products fetched:', data.products);
-        setProducts(data.products);
+        console.log('Products fetched:', data);
+        setProducts(data);
       } else {
         console.error('Error fetching products:', response.status);
-        // Try fetching from public API as fallback
-        const publicResponse = await fetch('/api/products');
-        if (publicResponse.ok) {
-          const publicData = await publicResponse.json();
-          console.log('Products fetched from public API:', publicData);
-          setProducts(publicData);
-        }
+        setProducts([]);
       }
     } catch (error) {
       console.error('Error fetching products:', error);
+      setProducts([]);
+    } finally {
+      setProductsLoading(false);
     }
   };
 
@@ -847,12 +842,16 @@ export default function Admin() {
                     <p className="text-xs text-gray-500 mt-1">Products loaded: {products.length}</p>
                   </div>
                   <div className="flex space-x-3">
-                    <Link 
-                      href="/" 
-                      className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-sm"
+                    <button
+                      onClick={() => {
+                        console.log('Refreshing products...');
+                        fetchProducts();
+                      }}
+                      disabled={productsLoading}
+                      className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-sm disabled:opacity-50"
                     >
-                      View Store
-                    </Link>
+                      {productsLoading ? '⏳ Loading...' : '🔄 Refresh Products'}
+                    </button>
                     <button
                       onClick={() => {
                         setEditingProduct(null);
@@ -1031,6 +1030,12 @@ export default function Admin() {
                   <div className="px-6 py-4 border-b border-gray-200">
                     <h3 className="text-lg font-medium text-gray-900">All Products</h3>
                   </div>
+                  {productsLoading ? (
+                    <div className="px-6 py-12 text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                      <p className="text-gray-500">Loading products...</p>
+                    </div>
+                  ) : (
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
@@ -1110,6 +1115,7 @@ export default function Admin() {
                       </tbody>
                     </table>
                   </div>
+                  )}
                 </div>
               </>
             )}
