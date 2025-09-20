@@ -72,15 +72,15 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Head>
-         <title>e-commerce Store</title>
-        <meta name="description" content="Your one-stop shop for premium products" />
+        <title>ROG Store - Gaming Products</title>
+        <meta name="description" content="Premium gaming products from ROG" />
       </Head>
 
       <nav className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-               <h1 className="text-2xl font-bold text-gray-900">e-commerce</h1>
+              <h1 className="text-2xl font-bold text-gray-900">ROG Store</h1>
             </div>
             <div className="flex items-center space-x-4">
               {user ? (
@@ -94,9 +94,6 @@ export default function Home() {
                   </Link>
                   <Link href="/profile" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
                     Profile
-                  </Link>
-                  <Link href="/admin" className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
-                    Admin Login
                   </Link>
                   <button
                     onClick={() => {
@@ -116,9 +113,6 @@ export default function Home() {
                   <Link href="/signup" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
                     Sign Up
                   </Link>
-                  <Link href="/admin" className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
-                    Admin Login
-                  </Link>
                 </>
               )}
             </div>
@@ -128,8 +122,8 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
-           <h2 className="text-4xl font-bold text-gray-900 mb-4">e-commerce Store</h2>
-          <p className="text-xl text-gray-600">Your one-stop shop for premium products</p>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">ROG Gaming Products</h2>
+          <p className="text-xl text-gray-600">Premium gaming equipment for the ultimate gaming experience</p>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

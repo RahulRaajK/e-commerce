@@ -113,6 +113,7 @@ export default function Cart() {
     phone: '',
     plusCode: ''
   });
+  const [profileData, setProfileData] = useState(null);
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
@@ -389,7 +390,7 @@ export default function Cart() {
                       required
                     />
                     <p className="mt-1 text-sm text-gray-500">
-                      Enter your Google Plus Code for precise delivery location. You can find it in Google Maps by dropping a pin.
+                      Enter your Google Plus Code for precise delivery location.
                     </p>
                   </div>
 
