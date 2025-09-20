@@ -95,6 +95,9 @@ export default function Home() {
                   <Link href="/profile" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
                     Profile
                   </Link>
+                  <Link href="/admin" className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                    Admin Login
+                  </Link>
                   <button
                     onClick={() => {
                       sessionStorage.removeItem('token');
@@ -112,6 +115,9 @@ export default function Home() {
                   </Link>
                   <Link href="/signup" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
                     Sign Up
+                  </Link>
+                  <Link href="/admin" className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                    Admin Login
                   </Link>
                 </>
               )}
