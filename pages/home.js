@@ -72,7 +72,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Head>
-         <title>e-commerce - Gaming Products</title>
+         <title>e-commerce Store</title>
         <meta name="description" content="Premium gaming products from ROG" />
       </Head>
 
@@ -128,8 +128,8 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
-           <h2 className="text-4xl font-bold text-gray-900 mb-4">e-commerce Gaming Products</h2>
-          <p className="text-xl text-gray-600">Premium gaming equipment for the ultimate gaming experience</p>
+           <h2 className="text-4xl font-bold text-gray-900 mb-4">e-commerce Store</h2>
+          <p className="text-xl text-gray-600">Your one-stop shop for premium products</p>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
