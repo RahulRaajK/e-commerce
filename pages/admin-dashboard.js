@@ -32,7 +32,7 @@ export default function AdminDashboard() {
     }
     fetchOrders();
     fetchProducts();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

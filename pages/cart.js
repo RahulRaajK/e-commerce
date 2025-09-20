@@ -22,7 +22,7 @@ export default function Cart() {
     fetchUser();
     fetchProducts();
     fetchProfileData();
-  }, [cart]);
+  }, [cart, router]);
   const fetchUser = async () => {
     if (typeof window === 'undefined') return;
     
@@ -113,7 +113,6 @@ export default function Cart() {
     phone: '',
     plusCode: ''
   });
-  const [profileData, setProfileData] = useState(null);
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -11,12 +11,8 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  useEffect(() => {
-    if (id) {
-      fetchProduct();
-    }
-  }, [id]);
-  const fetchProduct = async () => {
+  
+  const fetchProduct = useCallback(async () => {
     try {
       const response = await fetch(`/api/products/${id}`);
       const data = await response.json();
@@ -26,7 +22,13 @@ export default function ProductDetails() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchProduct();
+    }
+  }, [id, fetchProduct]);
   const handleAddToCart = async () => {
     const success = await addToCart(id, quantity);
     if (success) {
