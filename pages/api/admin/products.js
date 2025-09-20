@@ -41,8 +41,57 @@ export default async function handler(req, res) {
       console.error('Error creating product:', error);
       res.status(500).json({ error: 'Failed to create product' });
     }
+  } else if (req.method === 'PUT') {
+    try {
+      const { productId, name, description, price, image, category, stock } = req.body;
+      if (!productId) {
+        return res.status(400).json({ error: 'Product ID is required' });
+      }
+      if (!name || !description || !price || !image || !category || stock === undefined) {
+        return res.status(400).json({ error: 'All fields are required' });
+      }
+      if (isNaN(price) || price <= 0) {
+        return res.status(400).json({ error: 'Price must be a positive number' });
+      }
+      if (!Number.isInteger(stock) || stock < 0) {
+        return res.status(400).json({ error: 'Stock must be a non-negative integer' });
+      }
+      
+      const product = await Product.findByIdAndUpdate(
+        productId,
+        { name, description, price: parseFloat(price), image, category, stock: parseInt(stock) },
+        { new: true }
+      );
+      
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      
+      res.status(200).json({ product, message: 'Product updated successfully' });
+    } catch (error) {
+      console.error('Error updating product:', error);
+      res.status(500).json({ error: 'Failed to update product' });
+    }
+  } else if (req.method === 'DELETE') {
+    try {
+      const { productId } = req.body;
+      if (!productId) {
+        return res.status(400).json({ error: 'Product ID is required' });
+      }
+      
+      const product = await Product.findByIdAndDelete(productId);
+      
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      
+      res.status(200).json({ message: 'Product deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      res.status(500).json({ error: 'Failed to delete product' });
+    }
   } else {
-    res.setHeader('Allow', ['GET', 'POST']);
+    res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
     res.status(405).json({ error: `Method ${req.method} not allowed` });
   }
 }

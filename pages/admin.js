@@ -154,11 +154,24 @@ function AdminLoginForm() {
 export default function Admin() {
   const router = useRouter();
   const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [updating, setUpdating] = useState({});
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('orders');
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [productForm, setProductForm] = useState({
+    name: '',
+    description: '',
+    price: '',
+    image: '',
+    category: '',
+    stock: ''
+  });
+  const [productLoading, setProductLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return; // Skip on server side
@@ -171,6 +184,7 @@ export default function Admin() {
     }
     fetchUser();
     fetchOrders();
+    fetchProducts();
   }, []);
 
   const fetchUser = async () => {
@@ -220,6 +234,22 @@ export default function Admin() {
     }
   };
 
+  const fetchProducts = async () => {
+    if (typeof window === 'undefined') return; // Skip on server side
+    
+    try {
+      const response = await fetch('/api/admin/products');
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data.products);
+      } else {
+        console.error('Error fetching products');
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
   const updateOrderStatus = async (orderId, newStatus) => {
     if (typeof window === 'undefined') return; // Skip on server side
     
@@ -251,6 +281,113 @@ export default function Admin() {
       alert('An error occurred while updating order status');
     } finally {
       setUpdating(prev => ({ ...prev, [orderId]: false }));
+    }
+  };
+
+  const handleProductSubmit = async (e) => {
+    e.preventDefault();
+    setProductLoading(true);
+    
+    try {
+      const token = sessionStorage.getItem('adminToken');
+      const url = editingProduct ? '/api/admin/products' : '/api/admin/products';
+      const method = editingProduct ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...productForm,
+          price: parseFloat(productForm.price),
+          stock: parseInt(productForm.stock),
+          ...(editingProduct && { productId: editingProduct._id })
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (editingProduct) {
+          setProducts(prev => prev.map(p => p._id === editingProduct._id ? data.product : p));
+        } else {
+          setProducts(prev => [...prev, data.product]);
+        }
+        setShowProductForm(false);
+        setEditingProduct(null);
+        setProductForm({
+          name: '',
+          description: '',
+          price: '',
+          image: '',
+          category: '',
+          stock: ''
+        });
+        alert(editingProduct ? 'Product updated successfully!' : 'Product added successfully!');
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Error saving product:', error);
+      alert('An error occurred while saving the product');
+    } finally {
+      setProductLoading(false);
+    }
+  };
+
+  const handleEditProduct = (product) => {
+    setEditingProduct(product);
+    setProductForm({
+      name: product.name,
+      description: product.description,
+      price: product.price.toString(),
+      image: product.image,
+      category: product.category,
+      stock: product.stock.toString()
+    });
+    setShowProductForm(true);
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+    
+    try {
+      const token = sessionStorage.getItem('adminToken');
+      const response = await fetch('/api/admin/products', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId })
+      });
+
+      if (response.ok) {
+        setProducts(prev => prev.filter(p => p._id !== productId));
+        alert('Product deleted successfully!');
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('An error occurred while deleting the product');
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setProductForm(prev => ({
+          ...prev,
+          image: event.target.result
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -365,7 +502,35 @@ export default function Admin() {
           <div className="px-4 py-6 sm:px-0">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="mt-2 text-gray-600">Manage orders and update status for customers</p>
+              <p className="mt-2 text-gray-600">Manage orders and products for your store</p>
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="mb-8">
+              <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-8">
+                  <button
+                    onClick={() => setActiveTab('orders')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'orders'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Order Management
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('products')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'products'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Admin Tools
+                  </button>
+                </nav>
+              </div>
             </div>
             
             {/* Stats Cards */}
@@ -449,7 +614,9 @@ export default function Admin() {
               </div>
                   </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Management</h2>
+            {activeTab === 'orders' && (
+              <>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Management</h2>
             
             {/* Filter and Search Controls */}
             <div className="bg-white p-6 rounded-lg shadow mb-6">
@@ -633,6 +800,253 @@ export default function Admin() {
                 </div>
                 ))}
             </div>
+            )}
+              </>
+            )}
+
+            {activeTab === 'products' && (
+              <>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
+                  <button
+                    onClick={() => {
+                      setEditingProduct(null);
+                      setProductForm({
+                        name: '',
+                        description: '',
+                        price: '',
+                        image: '',
+                        category: '',
+                        stock: ''
+                      });
+                      setShowProductForm(true);
+                    }}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                  >
+                    Add New Product
+                  </button>
+                </div>
+
+                {showProductForm && (
+                  <div className="bg-white p-6 rounded-lg shadow mb-6">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">
+                      {editingProduct ? 'Edit Product' : 'Add New Product'}
+                    </h3>
+                    <form onSubmit={handleProductSubmit} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Product Name
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={productForm.name}
+                            onChange={(e) => setProductForm(prev => ({ ...prev, name: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter product name"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Category
+                          </label>
+                          <select
+                            required
+                            value={productForm.category}
+                            onChange={(e) => setProductForm(prev => ({ ...prev, category: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="">Select category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Gaming">Gaming</option>
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Description
+                        </label>
+                        <textarea
+                          required
+                          rows={3}
+                          value={productForm.description}
+                          onChange={(e) => setProductForm(prev => ({ ...prev, description: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Enter product description"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Price (₹)
+                          </label>
+                          <input
+                            type="number"
+                            required
+                            min="0"
+                            step="0.01"
+                            value={productForm.price}
+                            onChange={(e) => setProductForm(prev => ({ ...prev, price: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter price"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Stock Quantity
+                          </label>
+                          <input
+                            type="number"
+                            required
+                            min="0"
+                            value={productForm.stock}
+                            onChange={(e) => setProductForm(prev => ({ ...prev, stock: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter stock quantity"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Product Image
+                        </label>
+                        <div className="flex items-center space-x-4">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          />
+                          {productForm.image && (
+                            <img
+                              src={productForm.image}
+                              alt="Preview"
+                              className="h-20 w-20 object-cover rounded-md"
+                            />
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Upload an image or enter an image URL
+                        </p>
+                        <input
+                          type="url"
+                          value={productForm.image}
+                          onChange={(e) => setProductForm(prev => ({ ...prev, image: e.target.value }))}
+                          className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Or enter image URL"
+                        />
+                      </div>
+
+                      <div className="flex justify-end space-x-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowProductForm(false);
+                            setEditingProduct(null);
+                            setProductForm({
+                              name: '',
+                              description: '',
+                              price: '',
+                              image: '',
+                              category: '',
+                              stock: ''
+                            });
+                          }}
+                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={productLoading}
+                          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        >
+                          {productLoading ? 'Saving...' : (editingProduct ? 'Update Product' : 'Add Product')}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                <div className="bg-white shadow rounded-lg overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-medium text-gray-900">All Products</h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Product
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Category
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Price
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Stock
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {products.map((product) => (
+                          <tr key={product._id}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <img
+                                  className="h-12 w-12 object-cover rounded-md"
+                                  src={product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop&crop=center'}
+                                  alt={product.name}
+                                />
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                                  <div className="text-sm text-gray-500 truncate max-w-xs">{product.description}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {product.category}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              ₹{product.price.toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {product.stock}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => handleEditProduct(product)}
+                                  className="text-blue-600 hover:text-blue-900"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteProduct(product._id)}
+                                  className="text-red-600 hover:text-red-900"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </main>
