@@ -233,18 +233,87 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-            <button
-              onClick={() => {
-                sessionStorage.removeItem('adminToken');
-                router.push('/admin');
-              }}
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-            >
-              Logout
-            </button>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => router.push('/')}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                View Store
+              </button>
+              <button
+                onClick={() => router.push('/orders')}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+              >
+                My Orders
+              </button>
+              <button
+                onClick={() => router.push('/profile')}
+                className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
+              >
+                Profile
+              </button>
+              <button
+                onClick={() => {
+                  sessionStorage.removeItem('adminToken');
+                  router.push('/admin');
+                }}
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      <nav className="bg-gray-800 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center space-x-8 py-4">
+            <button
+              onClick={() => router.push('/')}
+              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              🏠 Home
+            </button>
+            <button
+              onClick={() => router.push('/products')}
+              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              🛍️ Products
+            </button>
+            <button
+              onClick={() => router.push('/cart')}
+              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              🛒 Cart
+            </button>
+            <button
+              onClick={() => router.push('/orders')}
+              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              📦 Orders
+            </button>
+            <button
+              onClick={() => router.push('/profile')}
+              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              👤 Profile
+            </button>
+            <button
+              onClick={() => router.push('/login')}
+              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              🔐 Login
+            </button>
+            <button
+              onClick={() => router.push('/signup')}
+              className="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              ✨ Sign Up
+            </button>
+          </div>
+        </div>
+      </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 gap-8">
