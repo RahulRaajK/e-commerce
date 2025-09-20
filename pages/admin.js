@@ -324,7 +324,24 @@ export default function Admin() {
           category: '',
           stock: ''
         });
-        alert(editingProduct ? 'Product updated successfully!' : 'Product added successfully!');
+        // Show success message
+        const successMessage = editingProduct ? 'Product updated successfully!' : 'Product added successfully!';
+        alert(successMessage);
+        
+        // Auto-hide form after successful add (not edit)
+        if (!editingProduct) {
+          setTimeout(() => {
+            setShowProductForm(false);
+            setProductForm({
+              name: '',
+              description: '',
+              price: '',
+              image: '',
+              category: '',
+              stock: ''
+            });
+          }, 1500);
+        }
       } else {
         const errorData = await response.json();
         alert(`Error: ${errorData.error}`);
@@ -348,6 +365,13 @@ export default function Admin() {
       stock: product.stock.toString()
     });
     setShowProductForm(true);
+    // Scroll to form
+    setTimeout(() => {
+      const formElement = document.querySelector('form');
+      if (formElement) {
+        formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const handleDeleteProduct = async (productId) => {
@@ -479,9 +503,6 @@ export default function Admin() {
               </div>
               <div className="flex items-center space-x-4">
                 <span className="text-gray-700">Welcome, {user?.username}</span>
-                <Link href="/" className="text-gray-700 hover:text-gray-900">
-                  View Store
-                </Link>
                 <button
                   onClick={() => {
                     if (typeof window !== 'undefined') {
@@ -807,31 +828,49 @@ export default function Admin() {
             {activeTab === 'products' && (
               <>
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
-                  <button
-                    onClick={() => {
-                      setEditingProduct(null);
-                      setProductForm({
-                        name: '',
-                        description: '',
-                        price: '',
-                        image: '',
-                        category: '',
-                        stock: ''
-                      });
-                      setShowProductForm(true);
-                    }}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                  >
-                    Add New Product
-                  </button>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
+                    <p className="text-sm text-gray-600 mt-1">Manage your product catalog and inventory</p>
+                  </div>
+                  <div className="flex space-x-3">
+                    <Link 
+                      href="/" 
+                      className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-sm"
+                    >
+                      View Store
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setEditingProduct(null);
+                        setProductForm({
+                          name: '',
+                          description: '',
+                          price: '',
+                          image: '',
+                          category: '',
+                          stock: ''
+                        });
+                        setShowProductForm(true);
+                      }}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                    >
+                      Add New Product
+                    </button>
+                  </div>
                 </div>
 
                 {showProductForm && (
-                  <div className="bg-white p-6 rounded-lg shadow mb-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">
-                      {editingProduct ? 'Edit Product' : 'Add New Product'}
-                    </h3>
+                  <div className="bg-white p-6 rounded-lg shadow mb-6 border-l-4 border-blue-500">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {editingProduct ? `Edit Product: ${editingProduct.name}` : 'Add New Product'}
+                      </h3>
+                      {editingProduct && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          Editing Mode
+                        </span>
+                      )}
+                    </div>
                     <form onSubmit={handleProductSubmit} className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -960,7 +999,7 @@ export default function Admin() {
                           }}
                           className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                         >
-                          Cancel
+                          {editingProduct ? 'Cancel Edit' : 'Cancel'}
                         </button>
                         <button
                           type="submit"
@@ -1028,15 +1067,15 @@ export default function Admin() {
                               <div className="flex space-x-2">
                                 <button
                                   onClick={() => handleEditProduct(product)}
-                                  className="text-blue-600 hover:text-blue-900"
+                                  className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 >
-                                  Edit
+                                  ✏️ Edit
                                 </button>
                                 <button
                                   onClick={() => handleDeleteProduct(product._id)}
-                                  className="text-red-600 hover:text-red-900"
+                                  className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                 >
-                                  Delete
+                                  🗑️ Delete
                                 </button>
                               </div>
                             </td>
