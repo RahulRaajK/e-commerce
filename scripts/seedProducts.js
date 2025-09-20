@@ -17,7 +17,7 @@ async function seedProducts() {
         name: 'ROG Laptops',
         description: 'High-performance gaming laptop with RGB and dedicated GPU.',
         price: 119999,
-        image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=1200&auto=format&fit=crop',
+        image: '/rog-laptop.png',
         stock: 20,
         category: 'Electronics'
       },
@@ -25,7 +25,7 @@ async function seedProducts() {
         name: 'Skybags Backpacks',
         description: 'Durable and stylish backpack for travel and daily commute.',
         price: 2499,
-        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1200&auto=format&fit=crop',
+        image: '/rog-backpack.png',
         stock: 100,
         category: 'Accessories'
       },
@@ -33,7 +33,7 @@ async function seedProducts() {
         name: 'Fastrack Sunglasses',
         description: 'Trendy UV-protection sunglasses for everyday style.',
         price: 1499,
-        image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=1200&auto=format&fit=crop',
+        image: '/rog-sunglasses.png',
         stock: 120,
         category: 'Fashion'
       },
@@ -41,7 +41,7 @@ async function seedProducts() {
         name: 'Boat Airdopes',
         description: 'Truly wireless earbuds with immersive sound and long battery.',
         price: 1999,
-        image: 'https://images.unsplash.com/photo-1606229364791-5e8e79fba399?q=80&w=1200&auto=format&fit=crop',
+        image: '/rog-airdopes.png',
         stock: 150,
         category: 'Electronics'
       },
@@ -49,7 +49,7 @@ async function seedProducts() {
         name: 'Smart Watch',
         description: 'Track fitness, heart rate, and notifications on the go.',
         price: 3499,
-        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop',
+        image: '/rog-smartwatches.png',
         stock: 80,
         category: 'Electronics'
       },
@@ -57,7 +57,7 @@ async function seedProducts() {
         name: 'Bluetooth Speakers',
         description: 'Portable speakers with deep bass and 12h battery life.',
         price: 2499,
-        image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?q=80&w=1200&auto=format&fit=crop',
+        image: '/rog-speaker.png',
         stock: 60,
         category: 'Electronics'
       },
@@ -65,7 +65,7 @@ async function seedProducts() {
         name: 'Joystick',
         description: 'Ergonomic game controller for console and PC.',
         price: 2999,
-        image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=1200&auto=format&fit=crop',
+        image: '/rog- joysruck.png',
         stock: 50,
         category: 'Gaming'
       }
