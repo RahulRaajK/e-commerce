@@ -843,14 +843,16 @@ export default function Home() {
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {products.map((product) => (
                       <div key={product._id} className="bg-white overflow-hidden shadow rounded-lg">
-                        <img
-                          className="h-48 w-full object-cover"
-                          src={product.image}
-                          alt={product.name}
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop&crop=center&auto=format&q=60';
-                          }}
-                        />
+                        <div className="h-48 w-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                          <img
+                            className="max-h-full max-w-full object-contain"
+                            src={product.image}
+                            alt={product.name}
+                            onError={(e) => {
+                              e.currentTarget.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop&crop=center&auto=format&q=60';
+                            }}
+                          />
+                        </div>
                         <div className="p-6">
                           <h3 className="text-lg font-medium text-gray-900 mb-2">{product.name}</h3>
                           <p className="text-gray-600 mb-4">{product.description}</p>
