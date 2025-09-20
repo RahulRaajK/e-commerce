@@ -243,12 +243,6 @@ export default function AdminDashboard() {
                 View Store
               </button>
               <button
-                onClick={() => router.push('/orders')}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
-              >
-                My Orders
-              </button>
-              <button
                 onClick={() => router.push('/profile')}
                 className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
               >
