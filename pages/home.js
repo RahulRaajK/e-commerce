@@ -73,7 +73,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <Head>
          <title>e-commerce Store</title>
-        <meta name="description" content="Premium gaming products from ROG" />
+        <meta name="description" content="Your one-stop shop for premium products" />
       </Head>
 
       <nav className="bg-white shadow">
