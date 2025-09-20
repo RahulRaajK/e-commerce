@@ -12,7 +12,7 @@ export default async function handler(req, res) {
             name: 'ROG Phone',
             description: 'Gaming smartphone with high-refresh display and performance cooling.',
             price: 59999,
-            image: 'https://m.media-amazon.com/images/I/61YVgHfQbpL._AC_SX679_.jpg',
+            image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1200&auto=format&fit=crop',
             stock: 30,
             category: 'Electronics'
           },
