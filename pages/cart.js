@@ -8,6 +8,8 @@ export default function Cart() {
   const [products, setProducts] = useState({});
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [profileData, setProfileData] = useState(null);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const token = sessionStorage.getItem('token');
@@ -91,11 +93,11 @@ export default function Cart() {
     }
   };
   const updateQuantity = async (productId, newQuantity) => {
-    if (typeof window === 'undefined') return; // Skip on server side
+    if (typeof window === 'undefined') return;
     
     const token = sessionStorage.getItem('token');
     try {
-      await fetch('/api/cart', {
+      const response = await fetch('/api/cart', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -103,17 +105,29 @@ export default function Cart() {
         },
         body: JSON.stringify({ productId, quantity: newQuantity })
       });
-      fetchCart();
+      
+      if (response.ok) {
+        const updatedCart = await response.json();
+        setCart(updatedCart);
+        
+        if (newQuantity <= 0) {
+          setProducts(prev => {
+            const newProducts = { ...prev };
+            delete newProducts[productId];
+            return newProducts;
+          });
+        }
+      }
     } catch (error) {
       console.error('Error updating cart:', error);
     }
   };
   const removeItem = async (productId) => {
-    if (typeof window === 'undefined') return; // Skip on server side
+    if (typeof window === 'undefined') return;
     
     const token = sessionStorage.getItem('token');
     try {
-      await fetch('/api/cart', {
+      const response = await fetch('/api/cart', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +135,16 @@ export default function Cart() {
         },
         body: JSON.stringify({ productId })
       });
-      fetchCart();
+      
+      if (response.ok) {
+        const updatedCart = await response.json();
+        setCart(updatedCart);
+        setProducts(prev => {
+          const newProducts = { ...prev };
+          delete newProducts[productId];
+          return newProducts;
+        });
+      }
     } catch (error) {
       console.error('Error removing item:', error);
     }

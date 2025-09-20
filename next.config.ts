@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -16,9 +17,10 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  // Force rebuild to ensure local images are served
-  generateBuildId: async () => {
-    return 'rog-images-update-' + Date.now();
-  },
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
+  swcMinify: true,
 };
+
 export default nextConfig;
