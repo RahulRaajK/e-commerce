@@ -49,6 +49,8 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
