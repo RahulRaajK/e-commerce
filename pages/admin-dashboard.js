@@ -24,6 +24,8 @@ export default function AdminDashboard() {
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [showAllProducts, setShowAllProducts] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -198,8 +200,15 @@ export default function AdminDashboard() {
         image: imageUrl
       };
       
-      const response = await fetch('/api/admin/products', {
-        method: 'POST',
+      const method = editingProduct ? 'PUT' : 'POST';
+      const url = editingProduct ? '/api/admin/products' : '/api/admin/products';
+      
+      if (editingProduct) {
+        productData.productId = editingProduct._id;
+      }
+      
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -209,28 +218,82 @@ export default function AdminDashboard() {
 
       if (response.ok) {
         const data = await response.json();
-        setProducts(prev => [...prev, data.product]);
-        setProductForm({
-          name: '',
-          description: '',
-          price: '',
-          image: '',
-          category: '',
-          stock: ''
-        });
-        setSelectedFile(null);
-        setImagePreview(null);
-        setShowProductForm(false);
-        alert('Product added successfully!');
+        if (editingProduct) {
+          setProducts(prev => prev.map(p => p._id === editingProduct._id ? data.product : p));
+          alert('Product updated successfully!');
+        } else {
+          setProducts(prev => [...prev, data.product]);
+          alert('Product added successfully!');
+        }
+        resetForm();
       } else {
         const errorData = await response.json();
         alert(`Error: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Error adding product:', error);
-      alert('Error adding product');
+      console.error('Error saving product:', error);
+      alert('Error saving product');
     } finally {
       setProductLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setProductForm({
+      name: '',
+      description: '',
+      price: '',
+      image: '',
+      category: '',
+      stock: ''
+    });
+    setSelectedFile(null);
+    setImagePreview(null);
+    setEditingProduct(null);
+    setShowProductForm(false);
+  };
+
+  const editProduct = (product) => {
+    setEditingProduct(product);
+    setProductForm({
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+      stock: product.stock
+    });
+    setImagePreview(null);
+    setSelectedFile(null);
+    setShowProductForm(true);
+  };
+
+  const deleteProduct = async (productId) => {
+    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+      return;
+    }
+    
+    const token = sessionStorage.getItem('adminToken');
+    try {
+      const response = await fetch('/api/admin/products', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId })
+      });
+
+      if (response.ok) {
+        setProducts(prev => prev.filter(p => p._id !== productId));
+        alert('Product deleted successfully!');
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Error deleting product');
     }
   };
 
@@ -340,18 +403,34 @@ export default function AdminDashboard() {
 
           <div className="bg-white shadow rounded-lg p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Products</h2>
-              <button
-                onClick={() => setShowProductForm(!showProductForm)}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-              >
-                {showProductForm ? 'Cancel' : 'Add Product'}
-              </button>
+              <h2 className="text-xl font-semibold text-gray-900">Products ({products.length})</h2>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setShowAllProducts(!showAllProducts)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                >
+                  {showAllProducts ? 'Hide All' : 'View All Products'}
+                </button>
+                <button
+                  onClick={() => {
+                    if (editingProduct) {
+                      resetForm();
+                    } else {
+                      setShowProductForm(!showProductForm);
+                    }
+                  }}
+                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                >
+                  {showProductForm ? 'Cancel' : 'Add Product'}
+                </button>
+              </div>
             </div>
 
             {showProductForm && (
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Product</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  {editingProduct ? 'Edit Product' : 'Add New Product'}
+                </h3>
                 <form onSubmit={addProduct} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -479,11 +558,11 @@ export default function AdminDashboard() {
                       disabled={productLoading || uploading}
                       className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
-                      {uploading ? 'Uploading Image...' : productLoading ? 'Adding Product...' : 'Add Product'}
+                      {uploading ? 'Uploading Image...' : productLoading ? (editingProduct ? 'Updating Product...' : 'Adding Product...') : (editingProduct ? 'Update Product' : 'Add Product')}
                     </button>
                     <button
                       type="button"
-                      onClick={() => setShowProductForm(false)}
+                      onClick={resetForm}
                       className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
                     >
                       Cancel
@@ -493,8 +572,53 @@ export default function AdminDashboard() {
               </div>
             )}
 
+            {showAllProducts && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">All Products</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                  {products.map((product) => (
+                    <div key={product._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-32 w-full object-cover rounded-md border border-gray-300 mb-3"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop&crop=center&auto=format&q=60';
+                          }}
+                        />
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900 mb-1">{product.name}</h4>
+                          <p className="text-sm text-gray-600 mb-2">₹{product.price.toLocaleString()}</p>
+                          <p className="text-sm text-gray-600 mb-2">Stock: {product.stock}</p>
+                          <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded mb-3 inline-block">
+                            {product.category}
+                          </span>
+                          <p className="text-xs text-gray-500 mb-3 line-clamp-2">{product.description}</p>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => editProduct(product)}
+                              className="flex-1 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 text-sm"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => deleteProduct(product._id)}
+                              className="flex-1 bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 text-sm"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {products.map((product) => (
+              {products.slice(0, showAllProducts ? 0 : 5).map((product) => (
                 <div key={product._id} className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow">
                   <div className="flex items-start space-x-3">
                     <img
@@ -513,9 +637,25 @@ export default function AdminDashboard() {
                           <p className="text-sm text-gray-600">Stock: {product.stock}</p>
                           <p className="text-xs text-gray-500 mt-1 line-clamp-2">{product.description}</p>
                         </div>
-                        <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
-                          {product.category}
-                        </span>
+                        <div className="flex flex-col items-end space-y-1">
+                          <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                            {product.category}
+                          </span>
+                          <div className="flex space-x-1">
+                            <button
+                              onClick={() => editProduct(product)}
+                              className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => deleteProduct(product._id)}
+                              className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
