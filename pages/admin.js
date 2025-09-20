@@ -1064,7 +1064,7 @@ export default function Admin() {
                               <div className="flex flex-col items-center">
                                 <div className="text-4xl mb-4">📦</div>
                                 <div className="text-lg font-medium mb-2">No products found</div>
-                                <div className="text-sm">Click "Add New Product" to get started</div>
+                                <div className="text-sm">Click &quot;Add New Product&quot; to get started</div>
                               </div>
                             </td>
                           </tr>

@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
   },
   // Force rebuild to ensure local images are served
   generateBuildId: async () => {
-    return 'rog-images-update-' + Date.now();
+    return 'rog-admin-fix-' + Math.floor(Date.now() / 1000);
   },
 };
 export default nextConfig;
