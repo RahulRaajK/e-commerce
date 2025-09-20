@@ -65,7 +65,7 @@ async function seedProducts() {
         name: 'ROG Joystick',
         description: 'Ergonomic game controller for console and PC.',
         price: 2999,
-        image: '/rog- joysruck.png',
+        image: '/rog-joystick.png',
         stock: 50,
         category: 'Gaming'
       }
