@@ -16,6 +16,12 @@ export default async function handler(req, res) {
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required' });
   }
+  if (typeof username !== 'string' || username.trim().length === 0) {
+    return res.status(400).json({ error: 'Username must be a non-empty string' });
+  }
+  if (typeof password !== 'string' || password.length === 0) {
+    return res.status(400).json({ error: 'Password must be a non-empty string' });
+  }
 
   try {
     // Find admin by username or email
@@ -67,6 +73,9 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('Admin login error:', error);
-    res.status(500).json({ error: 'Server error' });
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: 'Validation error: ' + error.message });
+    }
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 }

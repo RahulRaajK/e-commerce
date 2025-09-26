@@ -10,6 +10,15 @@ export default async function handler(req, res) {
     if (!username || !email || !password) {
       return res.status(400).json({ error: 'All fields are required' });
     }
+    if (typeof username !== 'string' || username.trim().length < 3) {
+      return res.status(400).json({ error: 'Username must be at least 3 characters long' });
+    }
+    if (typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ error: 'Please provide a valid email address' });
+    }
+    if (typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+    }
     try {
       const existingUser = await User.findOne({ $or: [{ email }, { username }] });
       if (existingUser) {
@@ -21,7 +30,14 @@ export default async function handler(req, res) {
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res.status(201).json({ token, user: { id: user._id, username: user.username, email: user.email } });
     } catch (error) {
-      res.status(500).json({ error: 'Server error' });
+      console.error('Signup API error:', error);
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: 'Validation error: ' + error.message });
+      }
+      if (error.code === 11000) {
+        return res.status(400).json({ error: 'Username or email already exists' });
+      }
+      res.status(500).json({ error: 'Server error: ' + error.message });
     }
   } else {
     res.setHeader('Allow', ['POST']);

@@ -25,6 +25,9 @@ export default async function handler(req, res) {
       if (!shippingInfo) {
         return res.status(400).json({ error: 'Shipping information is required' });
       }
+      if (!shippingInfo.firstName || !shippingInfo.lastName || !shippingInfo.phone || !shippingInfo.plusCode) {
+        return res.status(400).json({ error: 'All shipping fields are required' });
+      }
       let totalAmount = 0;
       const orderItems = [];
       for (const item of items) {
@@ -45,9 +48,16 @@ export default async function handler(req, res) {
       res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
+    console.error('Orders API error:', error);
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Invalid token' });
     }
-    res.status(500).json({ error: 'Server error' });
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: 'Validation error: ' + error.message });
+    }
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid ID format' });
+    }
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 }

@@ -26,10 +26,30 @@ export default async function handler(req, res) {
       const { firstName, lastName, phone, plusCode } = req.body;
       
       const updateData = {};
-      if (firstName !== undefined) updateData.firstName = firstName;
-      if (lastName !== undefined) updateData.lastName = lastName;
-      if (phone !== undefined) updateData.phone = phone;
-      if (plusCode !== undefined) updateData.plusCode = plusCode;
+      if (firstName !== undefined) {
+        if (typeof firstName !== 'string' || firstName.trim().length === 0) {
+          return res.status(400).json({ error: 'First name must be a non-empty string' });
+        }
+        updateData.firstName = firstName.trim();
+      }
+      if (lastName !== undefined) {
+        if (typeof lastName !== 'string' || lastName.trim().length === 0) {
+          return res.status(400).json({ error: 'Last name must be a non-empty string' });
+        }
+        updateData.lastName = lastName.trim();
+      }
+      if (phone !== undefined) {
+        if (typeof phone !== 'string' || phone.trim().length === 0) {
+          return res.status(400).json({ error: 'Phone must be a non-empty string' });
+        }
+        updateData.phone = phone.trim();
+      }
+      if (plusCode !== undefined) {
+        if (typeof plusCode !== 'string' || plusCode.trim().length === 0) {
+          return res.status(400).json({ error: 'Plus code must be a non-empty string' });
+        }
+        updateData.plusCode = plusCode.trim();
+      }
 
       const user = await User.findByIdAndUpdate(
         userId,
@@ -47,9 +67,16 @@ export default async function handler(req, res) {
       res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
+    console.error('User profile API error:', error);
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Invalid token' });
     }
-    res.status(500).json({ error: 'Server error' });
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: 'Validation error: ' + error.message });
+    }
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid ID format' });
+    }
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 }

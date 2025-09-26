@@ -78,26 +78,38 @@ export default async function handler(req, res) {
       const products = await Product.find({});
       res.status(200).json(products);
     } catch (error) {
-      res.status(500).json({ error: 'Server error' });
+      console.error('Products API error:', error);
+      res.status(500).json({ error: 'Server error: ' + error.message });
     }
   } else if (req.method === 'POST') {
     const { name, description, price, image, stock } = req.body;
     if (!name || !description || !price || !image || stock === undefined) {
       return res.status(400).json({ error: 'All fields are required' });
     }
+    if (isNaN(price) || price <= 0) {
+      return res.status(400).json({ error: 'Price must be a positive number' });
+    }
+    if (!Number.isInteger(stock) || stock < 0) {
+      return res.status(400).json({ error: 'Stock must be a non-negative integer' });
+    }
     try {
       const product = new Product({ name, description, price, image, stock });
       await product.save();
       res.status(201).json(product);
     } catch (error) {
-      res.status(500).json({ error: 'Server error' });
+      console.error('Error creating product:', error);
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: 'Validation error: ' + error.message });
+      }
+      res.status(500).json({ error: 'Server error: ' + error.message });
     }
   } else if (req.method === 'DELETE') {
     try {
       await Product.deleteMany({});
       res.status(200).json({ message: 'All products deleted successfully' });
     } catch (error) {
-      res.status(500).json({ error: 'Server error' });
+      console.error('Error deleting products:', error);
+      res.status(500).json({ error: 'Server error: ' + error.message });
     }
   } else {
     res.setHeader('Allow', ['GET', 'POST', 'DELETE']);

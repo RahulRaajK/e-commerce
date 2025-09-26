@@ -19,6 +19,9 @@ export default async function handler(req, res) {
       if (!productId) {
         return res.status(400).json({ error: 'Product ID is required' });
       }
+      if (quantity <= 0 || !Number.isInteger(quantity)) {
+        return res.status(400).json({ error: 'Quantity must be a positive integer' });
+      }
       const existingItem = cart[userId].find(item => item.productId === productId);
       if (existingItem) {
         existingItem.quantity += quantity;
@@ -30,6 +33,9 @@ export default async function handler(req, res) {
       const { productId, quantity } = req.body;
       if (!productId || quantity === undefined) {
         return res.status(400).json({ error: 'Product ID and quantity are required' });
+      }
+      if (quantity < 0 || !Number.isInteger(quantity)) {
+        return res.status(400).json({ error: 'Quantity must be a non-negative integer' });
       }
       const item = cart[userId].find(item => item.productId === productId);
       if (item) {
@@ -51,6 +57,10 @@ export default async function handler(req, res) {
       res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
-    res.status(401).json({ error: 'Invalid token' });
+    console.error('Cart API error:', error);
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 }

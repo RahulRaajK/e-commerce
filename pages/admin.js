@@ -984,15 +984,8 @@ export default function Admin() {
                           )}
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
-                          Upload an image or enter an image URL
+                          Upload an image file from your computer
                         </p>
-                        <input
-                          type="url"
-                          value={productForm.image}
-                          onChange={(e) => setProductForm(prev => ({ ...prev, image: e.target.value }))}
-                          className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Or enter image URL"
-                        />
                       </div>
 
                       <div className="flex justify-end space-x-3">

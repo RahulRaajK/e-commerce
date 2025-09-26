@@ -41,10 +41,13 @@ export default async function handler(req, res) {
       }
     });
   } catch (error) {
+    console.error('Admin auth error:', error);
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Invalid token' });
     }
-    console.error('Admin auth error:', error);
-    res.status(500).json({ error: 'Server error' });
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid admin ID format' });
+    }
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 }

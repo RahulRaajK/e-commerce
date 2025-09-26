@@ -37,6 +37,9 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error('Auth/me Error:', error);
-    res.status(500).json({ error: 'Server error' });
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid user ID format' });
+    }
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 }

@@ -20,6 +20,10 @@ export default async function handler(req, res) {
       res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
-    res.status(401).json({ error: 'Invalid token' });
+    console.error('Checkout API error:', error);
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 }

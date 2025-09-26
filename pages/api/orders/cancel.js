@@ -3,7 +3,7 @@ import Order from '@/models/Order.js';
 import User from '@/models/User.js';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -35,6 +35,9 @@ export default async function handler(req, res) {
     
     if (!orderId) {
       return res.status(400).json({ error: 'Order ID is required' });
+    }
+    if (typeof orderId !== 'string' || orderId.trim().length === 0) {
+      return res.status(400).json({ error: 'Order ID must be a non-empty string' });
     }
 
     // Find the order and verify it belongs to the user
@@ -68,6 +71,12 @@ export default async function handler(req, res) {
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Invalid token' });
     }
-    res.status(500).json({ error: 'Server error during order cancellation' });
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: 'Validation error: ' + error.message });
+    }
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid order ID format' });
+    }
+    res.status(500).json({ error: 'Server error during order cancellation: ' + error.message });
   }
 }

@@ -16,9 +16,11 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  // Force rebuild to ensure local images are served
+  // External packages for server runtime
+  serverExternalPackages: ['mongoose'],
+  // Stable build ID to avoid unnecessary rebuilds
   generateBuildId: async () => {
-    return 'rog-admin-fix-' + Math.floor(Date.now() / 1000);
+    return 'rog-ecommerce-v1';
   },
 };
 export default nextConfig;
